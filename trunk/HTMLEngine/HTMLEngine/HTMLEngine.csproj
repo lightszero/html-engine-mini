@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{33F8CE19-1D98-4D34-9342-B62C279D4E15}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HTMLEngine</RootNamespace>
+    <AssemblyName>HTMLEngine</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Core\DeviceChunk.cs" />
+    <Compile Include="Core\DeviceChunkCollection.cs" />
+    <Compile Include="Core\DeviceChunkLine.cs" />
+    <Compile Include="Core\DeviceChunkParser.cs" />
+    <Compile Include="Core\FontStyle.cs" />
+    <Compile Include="Core\DeviceChunkDrawImage.cs" />
+    <Compile Include="Core\DeviceChunkDrawText.cs" />
+    <Compile Include="Core\HtmlChunk.cs" />
+    <Compile Include="Core\HtmlChunkCollection.cs" />
+    <Compile Include="Core\HtmlChunkTag.cs" />
+    <Compile Include="Core\HtmlTags.cs" />
+    <Compile Include="Core\HtmlChunkWord.cs" />
+    <Compile Include="Core\Reader.cs" />
+    <Compile Include="Core\TextAlign.cs" />
+    <Compile Include="Core\VertAlign.cs" />
+    <Compile Include="HtColor.cs" />
+    <Compile Include="HtCompiler.cs" />
+    <Compile Include="HtDevice.cs" />
+    <Compile Include="HtEngine.cs" />
+    <Compile Include="HtFont.cs" />
+    <Compile Include="HtImage.cs" />
+    <Compile Include="HtLogger.cs" />
+    <Compile Include="HtLogLevel.cs" />
+    <Compile Include="HtPoint.cs" />
+    <Compile Include="HtRect.cs" />
+    <Compile Include="HtSize.cs" />
+    <Compile Include="PDictionary.cs" />
+    <Compile Include="PList.cs" />
+    <Compile Include="PStringBuilder.cs" />
+    <Compile Include="OP.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if /I "$(ConfigurationName)" == "Release" Eazfuscator.NET.exe "$(TargetPath)" --msbuild-project-path "$(ProjectPath)" --msbuild-project-configuration "$(ConfigurationName)" --msbuild-project-platform "$(PlatformName)" --msbuild-solution-path "$(SolutionPath)" -n --newline-flush -v 3.3
+copy /y $(TargetPath) $(SolutionDir)HTMLEngine_UnityApp\Assets\Resources</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
