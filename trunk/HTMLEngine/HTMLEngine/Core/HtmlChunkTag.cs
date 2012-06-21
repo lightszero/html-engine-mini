@@ -68,6 +68,7 @@ namespace HTMLEngine.Core
                                        ? reader.ReadQuotedString()
                                        : reader.ReadToStopChar(ATTR_VALUE_STOP_CHARS);
                 this.Attrs[attrName] = attrValue;
+                reader.SkipWhitespace();
             }
 
             switch (this.Tag)
