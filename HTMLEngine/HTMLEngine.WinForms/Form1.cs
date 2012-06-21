@@ -16,6 +16,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 DEALINGS IN THE SOFTWARE. */
 
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -47,6 +48,7 @@ namespace HTMLEngine.WinForms
 <br><p align=center valign=top>Picture <img src='smiles/sad.gif'> with &lt;p valign=top&gt;</p>
 <br><p align=center valign=middle>Picture <img src='smiles/smile.gif'> with &lt;p valign=middle&gt; much better than others in this case <img src='smiles/cool'></p>
 <br><p align=center valign=bottom>Picture <img src='smiles/sad.gif'> with &lt;p valign=bottom&gt;</p>
+<br><p align=center valign=middle><a href='textandimage'>Simple text and <img src='smiles/wink.gif'> image link.</a></p>
 
 ";
 
@@ -56,50 +58,71 @@ namespace HTMLEngine.WinForms
 
         public Form1()
         {
-            InitializeComponent();
-            htDevice = new HtmlDevice();
-            htCompiler = HtEngine.GetCompiler();
-            HtEngine.RegisterDevice(htDevice);
+            this.InitializeComponent();
+            this.htDevice = new HtmlDevice();
+            this.htCompiler = HtEngine.GetCompiler();
+            HtEngine.RegisterDevice(this.htDevice);
             HtEngine.DefaultFontSize = 14;
             HtEngine.DefaultFontFace = "Arial";
-            pictureBox1.BackColor = Color.RoyalBlue;
+            this.pictureBox1.BackColor = Color.RoyalBlue;
+
+            this.pictureBox1.MouseMove +=
+                (sender, args) =>
+                {
+                    this.pictureBox1.Cursor = this.htCompiler.GetLink(args.X, args.Y) == null
+                                                  ? Cursors.Default
+                                                  : Cursors.Hand;
+                };
+
+            this.pictureBox1.MouseClick += (sender, args) =>
+            {
+                string link = this.htCompiler.GetLink(args.X, args.Y);
+                if (link != null)
+                    MessageBox.Show("Link clicked: " + link);
+            };
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            textBox1.Text = demo1;
-        }
+        private void Form1_Load(object sender, EventArgs e) { this.textBox1.Text = demo1; }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
+            string tmp = string.Empty;
+            Stopwatch sw;
             HtmlDevice.Context = e.Graphics;
             try
             {
-                if (textChanged)
+                if (this.textChanged)
                 {
-                    htCompiler.Compile(textBox1.Text, pictureBox1.Width);
-                    textChanged = false;
+                    sw = Stopwatch.StartNew();
+                    this.htCompiler.Compile(this.textBox1.Text, this.pictureBox1.Width);
+                    sw.Stop();
+                    tmp = string.Format("Compile time: {0}ms ", sw.ElapsedMilliseconds);
+                    this.textChanged = false;
                 }
-                htCompiler.Draw(0);
+                sw = Stopwatch.StartNew();
+                this.htCompiler.Draw(0);
+                sw.Stop();
+                tmp += string.Format("Draw time: {0}ms ", sw.ElapsedMilliseconds);
             }
             finally
             {
                 HtmlDevice.Context = null;
+                this.Text = tmp;
             }
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            textChanged = true;
-            pictureBox1.Invalidate();
+            this.textChanged = true;
+            this.pictureBox1.Invalidate();
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            if (htCompiler != null)
+            if (this.htCompiler != null)
             {
-                htCompiler.Dispose();
-                htCompiler = null;
+                this.htCompiler.Dispose();
+                this.htCompiler = null;
             }
             base.OnClosed(e);
         }
