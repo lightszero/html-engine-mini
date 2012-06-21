@@ -97,6 +97,7 @@ namespace HTMLEngine.Core
                 case "a":
                 case "img":
                 case "p":
+                case "div":
                 case "br":
                 case "font":
                 case "code":

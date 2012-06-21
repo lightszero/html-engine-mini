@@ -23,7 +23,7 @@ namespace HTMLEngine.WinForms
     internal class HtmlFont : HtFont
     {
         private readonly Font font;
-        private int whiteSize=0;
+        private int wsize=-1;
 
         public HtmlFont(string face, int size, bool bold, bool italic)
             : base(face, size, bold, italic)
@@ -31,24 +31,27 @@ namespace HTMLEngine.WinForms
             FontStyle style = FontStyle.Regular;
             if (bold) style |= FontStyle.Bold;
             if (italic) style |= FontStyle.Italic;
-            this.font = new Font(face, size, style,GraphicsUnit.Pixel);
+            this.font = new Font(face, size, style, GraphicsUnit.Pixel);
         }
 
         public override int LineSpacing { get { return this.font.Height; } }
 
-        public override int WhiteSize { get
+        public override int WhiteSize
         {
-            if (this.whiteSize==0)
+            get
             {
-                this.whiteSize = Measure(" ").Width;
+                if (wsize<0)
+                {
+                    wsize = this.Measure(". .").Width - this.Measure("..").Width + 1;
+                }
+                return wsize;
             }
-            return this.whiteSize;
-        } }
+        }
 
         public override HtSize Measure(string text)
         {
             Debug.Assert(HtmlDevice.Context != null);
-            var tmp = HtmlDevice.Context.MeasureString(text, this.font);
+            var tmp = HtmlDevice.Context.MeasureString(text, this.font, 0, StringFormat.GenericTypographic);
             return new HtSize((int) tmp.Width, (int) tmp.Height);
         }
 
@@ -56,7 +59,7 @@ namespace HTMLEngine.WinForms
         {
             Debug.Assert(HtmlDevice.Context != null);
             var c = Color.FromArgb(color.A, color.R, color.G, color.B);
-            HtmlDevice.Context.DrawString(text, this.font, new SolidBrush(c), rect.X, rect.Y);
+            HtmlDevice.Context.DrawString(text, this.font, new SolidBrush(c), rect.X, rect.Y,StringFormat.GenericTypographic);
         }
     }
 }

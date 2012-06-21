@@ -1,4 +1,4 @@
-/* Copyright (C) 2012 Ruslan A. Abdrashitov
+﻿/* Copyright (C) 2012 Ruslan A. Abdrashitov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -15,44 +15,49 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 DEALINGS IN THE SOFTWARE. */
 
-using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace HTMLEngine.Core
 {
-    internal class DeviceChunkDrawText : DeviceChunk
+    internal class DeviceChunkDrawCompiled : DeviceChunk
     {
-        public DrawTextDeco Deco = DrawTextDeco.None;
-        public bool DecoStop;
-        public HtColor Color;
-        public string Text;
+        public HtCompiler compiled;
+        private bool offsetApplied;
+
+        public void Parse(IEnumerator<HtmlChunk> source, int width, TextAlign align = TextAlign.Left, VertAlign valign = VertAlign.Bottom)
+        {
+            compiled.Compile(source, width, align, valign);
+            offsetApplied = false;
+        }
+
+        internal override void OnAcquire()
+        {
+            offsetApplied = false;
+            compiled = HtEngine.GetCompiler();
+            base.OnAcquire();
+        }
+
+        internal override void OnRelease()
+        {
+            compiled.Dispose();
+            compiled = null;
+            base.OnRelease();
+        }
 
         public override void Draw(float deltaTime)
         {
-            HtDevice device = HtEngine.Device;
-            if (0 != (this.Deco & DrawTextDeco.Underline))
+            if (!offsetApplied)
             {
-                device.FillRect(new HtRect(Rect.X, Rect.Bottom - 2, DecoStop ? Rect.Width : this.TotalWidth, 1), this.Color);
+                compiled.Offset(Rect.X, Rect.Y);
+                offsetApplied = true;
             }
-            if (0 != (this.Deco & DrawTextDeco.Strike))
-            {
-                device.FillRect(new HtRect(Rect.X, Rect.Bottom - Rect.Height / 2 - 1, DecoStop ? Rect.Width : this.TotalWidth, 1), this.Color);
-            }
-            this.Font.Draw(this.Rect, this.Color, this.Text);
+            compiled.Draw(deltaTime);
         }
 
         public override void MeasureSize()
         {
-            Debug.Assert(this.Font != null, " font is not assigned");
-            Debug.Assert(string.IsNullOrEmpty(this.Text) == false, "text is not assigned");
-
-            HtSize size = this.Font.Measure(this.Text);
-            Rect.Width = size.Width;
-            Rect.Height = Font.LineSpacing; //size.Height;
-        }
-
-        public override string ToString()
-        {
-            return Text ?? "(null)";
+            Rect.Width = compiled.CompiledWidth;
+            Rect.Height = compiled.CompiledHeight;
         }
     }
 }

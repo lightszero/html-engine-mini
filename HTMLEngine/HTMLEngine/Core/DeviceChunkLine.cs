@@ -15,7 +15,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 DEALINGS IN THE SOFTWARE. */
 
-using System;
 using System.Collections.Generic;
 
 namespace HTMLEngine.Core
@@ -68,6 +67,16 @@ namespace HTMLEngine.Core
         }
 
         public List<DeviceChunk> Chunks { get { return list; } }
+
+        public int AvailWidth
+        {
+            get
+            {
+                DeviceChunk prev = list.Count > 0 ? list[list.Count - 1] : null;
+                var freeX = prev == null ? 0 : prev.Rect.Right + prev.Font.WhiteSize;
+                return MaxWidth - freeX;
+            }
+        }
 
         /// <summary>
         /// Add chunk to line

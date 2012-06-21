@@ -41,8 +41,12 @@
   <ItemGroup>
     <Compile Include="Core\DeviceChunk.cs" />
     <Compile Include="Core\DeviceChunkCollection.cs" />
+    <Compile Include="Core\DeviceChunkDrawTextEffect.cs" />
+    <Compile Include="Core\DeviceChunkDrawCompiled.cs" />
     <Compile Include="Core\DeviceChunkLine.cs" />
     <Compile Include="Core\DeviceChunkParser.cs" />
+    <Compile Include="Core\DrawTextDeco.cs" />
+    <Compile Include="Core\DrawTextEffect.cs" />
     <Compile Include="Core\FontStyle.cs" />
     <Compile Include="Core\DeviceChunkDrawImage.cs" />
     <Compile Include="Core\DeviceChunkDrawText.cs" />
