@@ -15,16 +15,15 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 DEALINGS IN THE SOFTWARE. */
 
+using System.Collections.Generic;
 using HTMLEngine.Core;
 
 namespace HTMLEngine
 {
     public class HtCompiler : PoolableObject
     {
-        internal override void OnAcquire()
-        {
-            this.d = OP<DeviceChunkCollection>.Acquire();
-        }
+        internal override void OnAcquire() { this.d = OP<DeviceChunkCollection>.Acquire(); }
+
         internal override void OnRelease()
         {
             this.d.Dispose();
@@ -32,7 +31,7 @@ namespace HTMLEngine
         }
 
         private readonly Reader reader = new Reader();
-        
+
         private DeviceChunkCollection d;
 
         public int CompiledWidth { get; private set; }
@@ -44,7 +43,7 @@ namespace HTMLEngine
             {
                 for (int link = 0; link < this.d.Links.Count; link++)
                 {
-                    var data = d.Links[link];
+                    KeyValuePair<DeviceChunk, string> data = this.d.Links[link];
                     if (data.Key.Contains(x, y)) return data.Value;
                 }
             }
@@ -53,40 +52,37 @@ namespace HTMLEngine
 
         public void Compile(string source, int width)
         {
-            d.Clear();
-//            bool debug = HtEngine.LogLevel == HtLogLevel.Debug;
-//            DateTime t = default(DateTime);
-//            if (debug)
-//            {
-//                t = DateTime.Now;
-//            }
-//            HtEngine.Log(HtLogLevel.Debug, "Compiling html...");
-            CompiledWidth = width;
             this.reader.SetSource(source);
             {
-                using (var h = OP<HtmlChunkCollection>.Acquire())
+                using (HtmlChunkCollection h = OP<HtmlChunkCollection>.Acquire())
                 {
-                    h.Read(reader);
-                    this.d.Parse(h, width);
-
-                    CompiledHeight = 0;
-                    // get height
-                    if (d.Lines.Count > 0)
-                    {
-                        var line = this.d.Lines[d.Lines.Count - 1];
-                        CompiledHeight = line.Y + line.Height;
-                    }
-                    else
-                    {
-                        CompiledHeight = 0;
-                    }
-//                    if (debug)
-//                    {
-//                        HtEngine.Log(HtLogLevel.Debug, "Compiler time: {0}ms", (DateTime.Now - t).TotalMilliseconds);
-//                    }
+                    h.Read(this.reader);
+                    this.Compile(h.GetEnumerator(), width);
                 }
             }
         }
+
+        internal void Compile(IEnumerator<HtmlChunk> source, int width, TextAlign align = TextAlign.Left, VertAlign valign = VertAlign.Bottom)
+        {
+            this.d.Clear();
+            this.CompiledWidth = width;
+            this.d.Parse(source, width, align, valign);
+            this.UpdateHeight();
+        }
+
+        private void UpdateHeight()
+        {
+            if (this.d.Lines.Count > 0)
+            {
+                DeviceChunkLine line = this.d.Lines[this.d.Lines.Count - 1];
+                this.CompiledHeight = line.Y + line.Height;
+            }
+            else
+            {
+                this.CompiledHeight = 0;
+            }
+        }
+
 
         public void Draw(float deltaTime)
         {
@@ -94,14 +90,32 @@ namespace HTMLEngine
             {
                 for (int lineIndex = 0; lineIndex < this.d.Lines.Count; lineIndex++)
                 {
-                    var line = this.d.Lines[lineIndex];
+                    DeviceChunkLine line = this.d.Lines[lineIndex];
                     for (int chunkIndex = 0; chunkIndex < line.Chunks.Count; chunkIndex++)
                     {
-                        var chunk = line.Chunks[chunkIndex];
+                        DeviceChunk chunk = line.Chunks[chunkIndex];
                         chunk.Draw(deltaTime);
                     }
                 }
             }
         }
+
+        public void Offset(int dx, int dy)
+        {
+            if (this.d != null)
+            {
+                for (int lineIndex = 0; lineIndex < this.d.Lines.Count; lineIndex++)
+                {
+                    DeviceChunkLine line = this.d.Lines[lineIndex];
+                    for (int chunkIndex = 0; chunkIndex < line.Chunks.Count; chunkIndex++)
+                    {
+                        DeviceChunk chunk = line.Chunks[chunkIndex];
+                        chunk.Rect.X += dx;
+                        chunk.Rect.Y += dy;
+                    }
+                }
+            }
+        }
+
     }
 }

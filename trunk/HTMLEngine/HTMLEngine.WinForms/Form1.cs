@@ -49,8 +49,16 @@ namespace HTMLEngine.WinForms
 <br><p align=center valign=middle>Picture <img src='smiles/smile.gif'> with &lt;p valign=middle&gt; much better than others in this case <img src='smiles/cool'></p>
 <br><p align=center valign=bottom>Picture <img src='smiles/sad.gif'> with &lt;p valign=bottom&gt;</p>
 <br><p align=center valign=middle><a href='textandimage'>Simple text and <img src='smiles/wink.gif'> image link.</a></p>
-
 ";
+
+        private const string demo2 = @"<p valign=middle>
+<div width=200><img src='logos/html.png'></div>
+<div>Another Hello World!!! Another Hello World!!! Another Hello World!!! Another Hello World!!! Another Hello World!!! Another Hello World!!! Another Hello World!!! Another Hello World!!!</div>
+<div width=100><img src='logos/html.png' width=100 height=100></div>
+<div width=100>Yet another Hello World!!!</div>
+</p>";
+
+        private const string demo = demo2;
 
         private readonly HtmlDevice htDevice;
         private HtCompiler htCompiler;
@@ -82,7 +90,7 @@ namespace HTMLEngine.WinForms
             };
         }
 
-        private void Form1_Load(object sender, EventArgs e) { this.textBox1.Text = demo1; }
+        private void Form1_Load(object sender, EventArgs e) { this.textBox1.Text = demo; }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {

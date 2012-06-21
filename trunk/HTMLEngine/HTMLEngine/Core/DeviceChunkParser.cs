@@ -21,14 +21,14 @@ namespace HTMLEngine.Core
 {
     partial class DeviceChunkCollection
     {
-        public void Parse(HtmlChunkCollection htmlChunks, int viewportWidth)
+        public void Parse(IEnumerator<HtmlChunk> htmlChunks, int viewportWidth, TextAlign align=TextAlign.Left, VertAlign valign=VertAlign.Bottom)
         {
             this.Clear();
             var defaultFont = HtEngine.Device.LoadFont(HtEngine.DefaultFontFace, HtEngine.DefaultFontSize, false, false);
             var font = defaultFont;
             var color = HtEngine.DefaultColor;
-            var align = TextAlign.Left;
-            var valign = VertAlign.Bottom;
+            //var align = TextAlign.Left;
+            //var valign = VertAlign.Bottom;
             DrawTextDeco deco = DrawTextDeco.None;
             DrawTextEffect effect = DrawTextEffect.None;
             HtColor effectColor = HtEngine.DefaultColor;
@@ -39,9 +39,10 @@ namespace HTMLEngine.Core
             DeviceChunkLine currLine = null;
             DeviceChunkDrawText lastTextChunk=null;
 
-            for (int i = 0; i < htmlChunks.Count; i++)
+            //for (int i = 0; i < htmlChunks.Count; i++)
+            while(htmlChunks.MoveNext())
             {
-                HtmlChunk htmlChunk = htmlChunks[i];
+                HtmlChunk htmlChunk = htmlChunks.Current;
 
                 var word = htmlChunk as HtmlChunkWord;
                 if (word != null)
@@ -103,6 +104,53 @@ namespace HTMLEngine.Core
                 {
                     switch (tag.Tag)
                     {
+                        case "div":
+                            if (tag.IsSingle)
+                            {
+                                // do nothing
+                            }
+                            else if (tag.IsClosing)
+                            {
+                                return; // return control to parent
+                            }
+                            else
+                            {
+                                var compiled = OP<DeviceChunkDrawCompiled>.Acquire();
+                                compiled.Font = font;
+                                var scompiledWidth = tag.GetAttr("width") ?? "0";
+                                var compiledWidth = 0;
+                                if (!int.TryParse(scompiledWidth, out compiledWidth)) compiledWidth = 0;
+                                if (compiledWidth==0)
+                                {
+                                    compiledWidth = currLine == null ? viewportWidth : currLine.AvailWidth;
+                                }
+                                if (compiledWidth>0)
+                                {
+                                    compiled.Parse(htmlChunks, compiledWidth, align, valign);
+                                    compiled.MeasureSize();
+                                    if (currLine == null)
+                                    {
+                                        currLine = this.NewLine(null, viewportWidth, align, valign);
+                                    }
+
+                                    if (!currLine.AddChunk(compiled))
+                                    {
+                                        currLine.IsFull = true;
+                                        currLine = this.NewLine(currLine, viewportWidth, align, valign);
+                                        if (!currLine.AddChunk(compiled))
+                                        {
+                                            HtEngine.Log(HtLogLevel.Error, "Could not fit div into line. Word is too big: {0}", lastTextChunk);
+                                            compiled.Dispose();
+                                            compiled = null;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    HtEngine.Log(HtLogLevel.Warning, "div width is not given");
+                                }
+                            }
+                            break;
                         case "effect":
                             if (tag.IsSingle)
                             {

@@ -33,6 +33,8 @@ namespace HTMLEngine
 
         public IEnumerable<T> Items { get { return list; } }
 
+        public IEnumerator<T> GetEnumerator() { return list.GetEnumerator(); }
+
         public T this[int index] { get { return this.list[index]; } set { this.list[index] = value; } }
 
         public override string ToString()

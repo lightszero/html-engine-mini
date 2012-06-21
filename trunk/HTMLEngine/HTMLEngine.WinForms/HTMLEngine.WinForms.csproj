@@ -94,6 +94,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="logos\html.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="smiles\cool.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
