@@ -15,48 +15,55 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 DEALINGS IN THE SOFTWARE. */
 
+using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
 
 namespace HTMLEngine.WinForms
 {
-    internal class HtmlFont : HtFont
+    internal class HtmlImage : HtImage
     {
-        private readonly Font font;
-        private int whiteSize=0;
+        private readonly Image image;
 
-        public HtmlFont(string face, int size, bool bold, bool italic)
-            : base(face, size, bold, italic)
+        public HtmlImage(string src)
         {
-            FontStyle style = FontStyle.Regular;
-            if (bold) style |= FontStyle.Bold;
-            if (italic) style |= FontStyle.Italic;
-            this.font = new Font(face, size, style,GraphicsUnit.Pixel);
-        }
-
-        public override int LineSpacing { get { return this.font.Height; } }
-
-        public override int WhiteSize { get
-        {
-            if (this.whiteSize==0)
+            src = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath) ?? ".", src);
+            try
             {
-                this.whiteSize = Measure(" ").Width;
+                this.image = Image.FromFile(src);
+                
             }
-            return this.whiteSize;
-        } }
-
-        public override HtSize Measure(string text)
-        {
-            Debug.Assert(HtmlDevice.Context != null);
-            var tmp = HtmlDevice.Context.MeasureString(text, this.font);
-            return new HtSize((int) tmp.Width, (int) tmp.Height);
+            catch
+            {
+                Console.WriteLine("Could not load image: {0}", src);
+                this.image = new Bitmap(1, 1);
+            }
         }
 
-        public override void Draw(HtRect rect, HtColor color, string text)
+        public override int Width
+        {
+            get
+            {
+                Debug.Assert(this.image != null);
+                return this.image.Width;
+            }
+        }
+
+        public override int Height
+        {
+            get
+            {
+                Debug.Assert(this.image != null);
+                return this.image.Height;
+            }
+        }
+
+        public override void Draw(HtRect rect, HtColor color)
         {
             Debug.Assert(HtmlDevice.Context != null);
-            var c = Color.FromArgb(color.A, color.R, color.G, color.B);
-            HtmlDevice.Context.DrawString(text, this.font, new SolidBrush(c), rect.X, rect.Y);
+            HtmlDevice.Context.DrawImage(this.image, rect.X, rect.Y, rect.Width, rect.Height);
         }
     }
 }
