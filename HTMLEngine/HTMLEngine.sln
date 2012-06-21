@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HTMLEngine", "HTMLEngine\HT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HTMLEngine.Unity3D", "HTMLEngine.Unity3D\HTMLEngine.Unity3D.csproj", "{6C4C92DE-D92B-4136-BA1C-B15E56E29FDB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HTMLEngine.WinForms", "HTMLEngine.WinForms\HTMLEngine.WinForms.csproj", "{830F7BA9-9A90-48B6-A641-83184379F938}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -23,6 +25,10 @@ Global
 		{6C4C92DE-D92B-4136-BA1C-B15E56E29FDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C4C92DE-D92B-4136-BA1C-B15E56E29FDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C4C92DE-D92B-4136-BA1C-B15E56E29FDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{830F7BA9-9A90-48B6-A641-83184379F938}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{830F7BA9-9A90-48B6-A641-83184379F938}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{830F7BA9-9A90-48B6-A641-83184379F938}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{830F7BA9-9A90-48B6-A641-83184379F938}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
