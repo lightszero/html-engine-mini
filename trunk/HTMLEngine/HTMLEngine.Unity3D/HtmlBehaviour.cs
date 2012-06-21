@@ -35,7 +35,7 @@ public class HtmlBehaviour : MonoBehaviour
     private const string demo0 =
         @"<p align=center><font face=title size=24><font color=yellow>HTMLEngine</font> for <font color=lime>Unity3D</font> (c) 2012 Profixy</font></p>
 <br>
-<p align=center><b>This is fully functional engine.<br>It's free for non-commercial use.<br>Commercial license types is under discussion.</b></p>
+<p align=center><b>This is fully functional engine.<br>It's free to use.<br></b></p>
 <br><p align=center>You <b>can</b> <s><font color=gray>not</font></s> edit<br>html inside text area. After all.</p>
 <br><p><i>Here is no any &lt;html&gt;, &lt;body&gt; etc tags. Only small subset of tags supported yet:</i></p>
 <br>
@@ -54,7 +54,7 @@ public class HtmlBehaviour : MonoBehaviour
 
     private const string demo1 =
         @"<p align=center><font face=title size=24><font color=yellow>HTMLEngine</font> for <font color=lime>Unity3D</font> (c) 2012 Profixy</font></p>
-<p align=left>Widtout effect:</p>
+<p align=left>Without effect:</p>
 <p align=center>Normal text<u>underlined</u><s>striked</s></p>
 <p align=center><b>Bold text<u>underlined</u><s>striked</s></b></p>
 <p align=center><i>Italic text<u>underlined</u><s>striked</s></i></p>
