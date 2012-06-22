@@ -48,6 +48,7 @@ namespace HTMLEngine.WinForms
 
         public override HtImage LoadImage(string src)
         {
+            if (string.IsNullOrEmpty(src)) src = "error";
             // try get from cache
             HtmlImage ret;
             if (images.TryGetValue(src, out ret)) return ret;

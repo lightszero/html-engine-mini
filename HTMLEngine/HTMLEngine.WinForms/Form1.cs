@@ -51,12 +51,14 @@ namespace HTMLEngine.WinForms
 <br><p align=center valign=middle><a href='textandimage'>Simple text and <img src='smiles/wink.gif'> image link.</a></p>
 ";
 
-        private const string demo2 = @"<p valign=middle>
+        private const string demo2 = @"
+<div valign=middle>
 <div width=200><img src='logos/html.png'></div>
 <div>Another Hello World!!! Another Hello World!!! Another Hello World!!! Another Hello World!!! Another Hello World!!! Another Hello World!!! Another Hello World!!! Another Hello World!!!</div>
 <div width=100><img src='logos/html.png' width=100 height=100></div>
-<div width=100>Yet another Hello World!!!</div>
-</p>";
+<div>Yet another Hello World!!! Yet another Hello World!!! Yet another Hello World!!! Yet another Hello World!!! <img src='smiles/cool.gif'></div>
+</div>
+";
 
         private const string demo = demo2;
 
