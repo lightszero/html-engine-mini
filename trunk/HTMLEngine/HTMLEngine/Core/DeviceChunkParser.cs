@@ -111,10 +111,12 @@ namespace HTMLEngine.Core
                             }
                             else if (tag.IsClosing)
                             {
+                                this.FinishLine(currLine,align,valign);
                                 return; // return control to parent
                             }
                             else
                             {
+                                ExctractAligns(tag, ref align, ref valign);
                                 var compiled = OP<DeviceChunkDrawCompiled>.Acquire();
                                 compiled.Font = font;
                                 var scompiledWidth = tag.GetAttr("width") ?? "0";
@@ -122,7 +124,7 @@ namespace HTMLEngine.Core
                                 if (!int.TryParse(scompiledWidth, out compiledWidth)) compiledWidth = 0;
                                 if (compiledWidth==0)
                                 {
-                                    compiledWidth = currLine == null ? viewportWidth : currLine.AvailWidth;
+                                    compiledWidth = currLine == null ? viewportWidth : currLine.AvailWidth-font.WhiteSize;
                                 }
                                 if (compiledWidth>0)
                                 {
@@ -378,57 +380,7 @@ namespace HTMLEngine.Core
                             {
                                 currLine = this.NewLine(currLine, viewportWidth, align, valign);
 
-                                var tmp = tag.GetAttr("ALIGN");
-                                if (tmp != null)
-                                {
-                                    switch (tmp.ToUpperInvariant())
-                                    {
-                                        case "CENTER":
-                                            align = TextAlign.Center;
-                                            break;
-                                        case "JUSTIFY":
-                                            align = TextAlign.Justify;
-                                            break;
-                                        case "RIGHT":
-                                            align = TextAlign.Right;
-                                            break;
-                                        case "LEFT":
-                                            align = TextAlign.Left;
-                                            break;
-                                        default:
-                                            HtEngine.Log(HtLogLevel.Warning, "Invalid attribute align: '{0}'", tmp);
-                                            align=TextAlign.Left;
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    align = TextAlign.Left;
-                                }
-                                tmp = tag.GetAttr("VALIGN");
-                                if (tmp != null)
-                                {
-                                    switch (tmp.ToUpperInvariant())
-                                    {
-                                        case "MIDDLE":
-                                            valign = VertAlign.Middle;
-                                            break;
-                                        case "TOP":
-                                            valign = VertAlign.Top;
-                                            break;
-                                        case "BOTTOM":
-                                            valign = VertAlign.Bottom;
-                                            break;
-                                        default:
-                                            HtEngine.Log(HtLogLevel.Warning, "Invalid attribute valign: '{0}'", tmp);
-                                            valign = VertAlign.Bottom;
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    valign = VertAlign.Bottom;
-                                }
+                                ExctractAligns(tag, ref align, ref valign);
                             }
                             
                             break;
@@ -441,6 +393,93 @@ namespace HTMLEngine.Core
 
             // align last line
             this.FinishLine(currLine, align, valign);
+        }
+
+        static void ExctractAligns(HtmlChunkTag tag, ref TextAlign align, ref VertAlign valign)
+        {
+            var tmp = tag.GetAttr("ALIGN");
+            if (tmp != null)
+            {
+                switch (tmp.ToUpperInvariant())
+                {
+                    case "CENTER":
+                        align = TextAlign.Center;
+                        break;
+                    case "JUSTIFY":
+                        align = TextAlign.Justify;
+                        break;
+                    case "RIGHT":
+                        align = TextAlign.Right;
+                        break;
+                    case "LEFT":
+                        align = TextAlign.Left;
+                        break;
+                    default:
+                        HtEngine.Log(HtLogLevel.Warning, "Invalid attribute align: '{0}'", tmp);
+                        align = TextAlign.Left;
+                        break;
+                }
+            }
+            else
+            {
+                //align = TextAlign.Left;
+            }
+            tmp = tag.GetAttr("VALIGN");
+            if (tmp != null)
+            {
+                switch (tmp.ToUpperInvariant())
+                {
+                    case "MIDDLE":
+                        valign = VertAlign.Middle;
+                        break;
+                    case "TOP":
+                        valign = VertAlign.Top;
+                        break;
+                    case "BOTTOM":
+                        valign = VertAlign.Bottom;
+                        break;
+                    default:
+                        HtEngine.Log(HtLogLevel.Warning, "Invalid attribute valign: '{0}'", tmp);
+                        valign = VertAlign.Bottom;
+                        break;
+                }
+            }
+            else
+            {
+                //valign = VertAlign.Bottom;
+            }
+        }
+
+        /// <summary>
+        /// Aligns prev line, creates new line and applies Y to it
+        /// </summary>
+        /// <param name="prevLine">previous line</param>
+        /// <param name="viewPortWidth">viewport width</param>
+        /// <param name="prevAlign">text align</param>
+        /// <param name="prevVAlign">vertical align</param>
+        /// <returns>new empty line</returns>
+        internal DeviceChunkLine NewLine(DeviceChunkLine prevLine, int viewPortWidth, TextAlign prevAlign, VertAlign prevVAlign)
+        {
+            int freeY = 0;
+            if (prevLine!=null)
+            {
+                this.FinishLine(prevLine, prevAlign, prevVAlign);
+                freeY = prevLine.Y + prevLine.Height;
+            }
+            var newLine = OP<DeviceChunkLine>.Acquire();
+            newLine.MaxWidth = viewPortWidth;
+            newLine.Y = freeY;
+            this.list.Add(newLine);
+            return newLine;
+        }
+
+        internal void FinishLine(DeviceChunkLine line, TextAlign align, VertAlign valign)
+        {
+            if (line!=null)
+            {
+                line.HorzAlign(align);
+                line.VertAlign(valign);
+            }
         }
     }
 }

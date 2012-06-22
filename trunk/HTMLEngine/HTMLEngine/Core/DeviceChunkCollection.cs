@@ -47,37 +47,5 @@ namespace HTMLEngine.Core
             this.alignStack.Clear();
             this.valignStack.Clear();
         }
-
-        /// <summary>
-        /// Aligns prev line, creates new line and applies Y to it
-        /// </summary>
-        /// <param name="prevLine">previous line</param>
-        /// <param name="viewPortWidth">viewport width</param>
-        /// <param name="prevAlign">text align</param>
-        /// <param name="prevVAlign">vertical align</param>
-        /// <returns>new empty line</returns>
-        internal DeviceChunkLine NewLine(DeviceChunkLine prevLine, int viewPortWidth, TextAlign prevAlign, VertAlign prevVAlign)
-        {
-            int freeY = 0;
-            if (prevLine!=null)
-            {
-                this.FinishLine(prevLine, prevAlign, prevVAlign);
-                freeY = prevLine.Y + prevLine.Height;
-            }
-            var newLine = OP<DeviceChunkLine>.Acquire();
-            newLine.MaxWidth = viewPortWidth;
-            newLine.Y = freeY;
-            list.Add(newLine);
-            return newLine;
-        }
-
-        internal void FinishLine(DeviceChunkLine line, TextAlign align, VertAlign valign)
-        {
-            if (line!=null)
-            {
-                line.HorzAlign(align);
-                line.VertAlign(valign);
-            }
-        }
     }
 }
